@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced GPS Tracker</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        padding: 20px;
+        background-color: #f4f4f4;
+        color: #333;
+    }
+    h1 {
+        color: #007BFF;
+    }
+    p {
+        font-size: 18px; /* Larger text for better readability */
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+</style>
+<script>
+let positions = [];
+const maxPositions = 5; // Maximum number of positions to calculate the rolling average
+
+function trackPosition(position) {
+    document.getElementById('latitude').textContent = 'Latitude: ' + position.coords.latitude.toFixed(6);
+    document.getElementById('longitude').textContent = 'Longitude: ' + position.coords.longitude.toFixed(6);
+    
+    positions.push(position);
+    if (positions.length > maxPositions) {
+        positions.shift(); // Remove the oldest position to maintain the size
+    }
+
+    if (positions.length > 1) {
+        const averagePosition = calculateAveragePosition(positions);
+        const bearing = calculateBearing(averagePosition.startLat, averagePosition.startLon, averagePosition.endLat, averagePosition.endLon);
+        document.getElementById('status').textContent = 'Direction: ' + bearing.toFixed(2) + '°';
+    }
+}
+
+function calculateAveragePosition(positions) {
+    let sumLat = 0, sumLon = 0, len = positions.length;
+    positions.forEach(pos => {
+        sumLat += pos.coords.latitude;
+        sumLon += pos.coords.longitude;
+    });
+    return {
+        startLat: positions[0].coords.latitude,
+        startLon: positions[0].coords.longitude,
+        endLat: sumLat / len,
+        endLon: sumLon / len
+    };
+}
+
+function calculateBearing(startLat, startLon, endLat, endLon) {
+    const φ1 = startLat * Math.PI / 180;
+    const φ2 = endLat * Math.PI / 180;
+    const Δλ = (endLon - startLon) * Math.PI / 180;
+    const y = Math.sin(Δλ) * Math.cos(φ2);
+    const x = Math.cos(φ1) * Math.sin(φ2) -
+              Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+    const θ = Math.atan2(y, x);
+    return (θ * 180 / Math.PI + 360) % 360; // in degrees
+}
+
+function handleError(error) {
+    console.error('ERROR(' + error.code + '): ' + error.message);
+    document.getElementById('status').textContent = 'Error: ' + error.message;
+}
+
+function startTracking() {
+    if (!navigator.geolocation) {
+        document.getElementById('status').textContent = 'Geolocation is not supported by your browser';
+    } else {
+        document.getElementById('status').textContent = 'Locating...';
+        navigator.geolocation.watchPosition(trackPosition, handleError, {
+            enableHighAccuracy: true,
+            maximumAge: 1000 // Allow a cached position within 1 second
+        });
+    }
+}
+
+window.onload = startTracking;
+</script>
+</head>
+<body>
+<h1>Advanced GPS Tracker</h1>
+<p id="status">Waiting for data...</p>
+<p id="latitude">Latitude: Waiting...</p>
+<p id="longitude">Longitude: Waiting...</p>
+</body>
+</html>

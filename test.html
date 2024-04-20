@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Compass Tool</title>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+    }
+    #compass {
+        width: 20px;
+        height: 20px;
+        background: url('compass.png') no-repeat center;
+        background-size: contain;
+        transform-origin: center;
+    }
+    #heading {
+        text-align: center;
+        font-size: 20px;
+        margin-top: 20px;
+    }
+</style>
+<script>
+function requestPermissions() {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation, false);
+                } else {
+                    alert('Permission not granted for DeviceOrientation');
+                }
+            })
+            .catch(console.error);
+    } else {
+        window.addEventListener('deviceorientation', handleOrientation, false);
+    }
+}
+
+function handleOrientation(event) {
+    const alpha = event.alpha;
+    const compassDiv = document.getElementById('compass');
+    compassDiv.style.transform = `rotate(${-alpha}deg)`;
+    document.getElementById('heading').textContent = `Heading: ${Math.round(alpha)}°`;
+}
+</script>
+</head>
+<body>
+<div id="compass"></div>
+<p id="heading">Heading: --°</p>
+<button onclick="requestPermissions()">Enable Orientation</button>
+</body>
+</html>

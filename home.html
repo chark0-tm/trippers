@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Location, Distance, and Direction</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Select a Destination</h2>
+        <select id="locationSelector" onchange="locationSelected()">
+            <option value="" selected>Select a location</option>
+            <option value="46.32061591275231,-72.60363925513721">A&W</option>
+            <option value="46.307848603628244,-72.58615371233131">Couche-Tard</option>
+            <option value="46.32180641109243,-72.59137336932483">Colisée Vidéotron</option>
+        </select>
+        <div class="info-box">
+            <p id="distance">Distance: Please select a location</p>
+            <p id="direction">Direction: </p>
+        </div>
+        <div class="compass-container">
+            <div id="compass" class="compass">
+                <img src="Asset 11.png" alt="Compass Arrow" class="compass-arrow"/>
+            </div>
+        </div>
+        <div class="description-overlay">
+            <p id="locationDescription"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
